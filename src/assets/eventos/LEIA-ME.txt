@@ -1,0 +1,19 @@
+COMO ADICIONAR EVENTOS (fotos e vídeos)
+=======================================
+
+1. Crie uma SUBPASTA por evento aqui dentro. O NOME da pasta vira o título.
+   Exemplos:
+     src/assets/eventos/Treinamento de Power BI/
+     src/assets/eventos/Evento de Tecnologia/
+
+2. Jogue as FOTOS dentro (.jpg .jpeg .png .webp) e, se tiver, 1 VÍDEO (.mp4 .webm).
+   - A primeira foto (ordem alfabética) vira a CAPA do card.
+   - Várias fotos = galeria com miniaturas no lightbox.
+
+3. Para ORDENAR os eventos, prefixe a pasta com número:
+     "01 - Treinamento de Power BI"  ->  exibe "Treinamento de Power BI"
+
+4. Rode o build/deploy de novo para o site detectar os novos arquivos.
+
+Dica: redimensione as fotos para ~1200px de largura e ~150-400KB cada.
+Vídeos longos: prefira o YouTube (depois migramos para o Supabase, dinâmico).
