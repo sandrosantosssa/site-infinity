@@ -11,34 +11,66 @@ export interface Evento {
   fotos?: string[];
 }
 
-interface DBEvento {
-  id: string;
-  titulo: string;
-  descricao: string | null;
-  data: string | null;
-  capa_url: string | null;
-  video_url: string | null;
-  ordem: number;
+const BUCKET = 'site-midia';
+const EVENTOS_PREFIX = 'eventos';
+
+function displayTitle(folder: string): string {
+  // remove prefixo de ordenação tipo "01 - " / "02_" / "3."
+  return folder.replace(/^\s*\d+\s*[-_.)]\s*/, '').trim();
 }
 
-/** Lista os eventos publicados. Retorna [] se o Supabase não estiver configurado. */
+const isImage = (n: string) => /\.(jpe?g|png|webp|gif)$/i.test(n);
+const isVideo = (n: string) => /\.(mp4|webm|mov)$/i.test(n);
+
+/**
+ * Lista os eventos a partir do Supabase Storage (bucket público "site-midia").
+ * Cada SUBPASTA em "eventos/<Nome do Evento>/" vira um evento; os arquivos
+ * dentro são as fotos (+ vídeo opcional). Gerenciado direto no Supabase,
+ * sem redeploy. Retorna [] se o Supabase não estiver configurado.
+ */
 export async function listEventos(): Promise<Evento[]> {
   if (!supabase) return [];
-  const { data, error } = await supabase
-    .from('eventos')
-    .select('id, titulo, descricao, data, capa_url, video_url, ordem')
-    .eq('publicado', true)
-    .order('ordem', { ascending: true })
-    .order('created_at', { ascending: false });
-  if (error || !data) return [];
-  return (data as DBEvento[]).map((r) => ({
-    id: r.id,
-    titulo: r.titulo,
-    descricao: r.descricao,
-    data: r.data,
-    capaUrl: r.capa_url,
-    videoUrl: r.video_url,
-  }));
+
+  // 1) lista as subpastas (cada uma é um evento)
+  const { data: entries, error } = await supabase.storage.from(BUCKET).list(EVENTOS_PREFIX, {
+    limit: 200,
+    sortBy: { column: 'name', order: 'asc' },
+  });
+  if (error || !entries) return [];
+
+  // pastas vêm com id === null
+  const folders = entries.filter((e) => e.id === null && e.name);
+
+  const eventos: Evento[] = [];
+  for (const folder of folders) {
+    const path = `${EVENTOS_PREFIX}/${folder.name}`;
+    const { data: files } = await supabase.storage.from(BUCKET).list(path, {
+      limit: 500,
+      sortBy: { column: 'name', order: 'asc' },
+    });
+    if (!files) continue;
+
+    const fotos = files
+      .filter((f) => isImage(f.name))
+      .map((f) => supabase!.storage.from(BUCKET).getPublicUrl(`${path}/${f.name}`).data.publicUrl);
+    const vid = files.find((f) => isVideo(f.name));
+    const videoUrl = vid
+      ? supabase!.storage.from(BUCKET).getPublicUrl(`${path}/${vid.name}`).data.publicUrl
+      : null;
+
+    if (!fotos.length && !videoUrl) continue;
+
+    eventos.push({
+      id: folder.name,
+      titulo: displayTitle(folder.name),
+      descricao: null,
+      data: null,
+      capaUrl: fotos[0] ?? null,
+      videoUrl,
+      fotos,
+    });
+  }
+  return eventos;
 }
 
 export interface ContatoInput {
