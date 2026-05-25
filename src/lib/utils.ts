@@ -16,4 +16,7 @@ export const SITE = {
   instagram: 'https://instagram.com/', // TODO
   linkedin: 'https://linkedin.com/', // TODO
   portalUrl: 'https://assinaturas.infinitysistemas.com.br',
+
+  /** Vídeo de fundo do Hero (loop, autoplay muted, com toggle de som). */
+  heroVideo: '/infinity_final.mp4',
 };
