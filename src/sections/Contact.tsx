@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { MessageCircle, Mail, MapPin, Send, CheckCircle2, Loader2 } from 'lucide-react';
 import { SITE } from '@/lib/utils';
 import { enviarContato } from '@/services/content.service';
+import { useT } from '@/i18n/LangContext';
 
 export function Contact() {
-  const waLink = `https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(
-    'Olá! Gostaria de saber mais sobre as soluções da Infinity Sistemas.'
-  )}`;
+  const t = useT().contact;
+  const waLink = `https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(t.whatsappMsg)}`;
 
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
@@ -20,7 +20,7 @@ export function Contact() {
     e.preventDefault();
     setErro(null);
     if (!nome.trim() || !email.trim() || !mensagem.trim()) {
-      setErro('Preencha nome, e-mail e mensagem.');
+      setErro(t.form.errRequired);
       return;
     }
     setSending(true);
@@ -33,7 +33,7 @@ export function Contact() {
       setTelefone('');
       setMensagem('');
     } else {
-      setErro(res.error ?? 'Não foi possível enviar. Tente pelo WhatsApp.');
+      setErro(res.error ?? t.form.errGeneric);
     }
   };
 
@@ -54,17 +54,14 @@ export function Contact() {
           <div className="animate-pulse-glow pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-[#5fded3]/20 blur-3xl" />
           <div className="animate-pulse-glow pointer-events-none absolute -bottom-16 -left-16 h-56 w-56 rounded-full bg-accent/20 blur-3xl" />
           <div className="relative grid gap-10 p-8 lg:grid-cols-2 lg:p-12">
-            {/* Esquerda — CTA + contatos */}
             <div>
               <span className="text-sm font-semibold uppercase tracking-wider text-accent">
-                Vamos conversar
+                {t.eyebrow}
               </span>
               <h2 className="mt-3 font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
-                Pronto para levar a sua empresa para o digital?
+                {t.title}
               </h2>
-              <p className="mt-4 max-w-md text-white/70">
-                Preencha o formulário ou fale direto com a gente. Respondemos rápido!
-              </p>
+              <p className="mt-4 max-w-md text-white/70">{t.description}</p>
 
               <div className="mt-8 space-y-3">
                 <a
@@ -77,7 +74,7 @@ export function Contact() {
                     <MessageCircle className="h-5 w-5 text-accent" />
                   </div>
                   <div>
-                    <p className="text-xs uppercase tracking-wider text-white/50">WhatsApp</p>
+                    <p className="text-xs uppercase tracking-wider text-white/50">{t.whatsappLabel}</p>
                     <p className="font-medium">{SITE.whatsappLabel}</p>
                   </div>
                 </a>
@@ -89,7 +86,7 @@ export function Contact() {
                     <Mail className="h-5 w-5 text-accent" />
                   </div>
                   <div>
-                    <p className="text-xs uppercase tracking-wider text-white/50">E-mail</p>
+                    <p className="text-xs uppercase tracking-wider text-white/50">{t.emailLabel}</p>
                     <p className="font-medium">{SITE.email}</p>
                   </div>
                 </a>
@@ -98,34 +95,31 @@ export function Contact() {
                     <MapPin className="h-5 w-5 text-accent" />
                   </div>
                   <div>
-                    <p className="text-xs uppercase tracking-wider text-white/50">Localização</p>
+                    <p className="text-xs uppercase tracking-wider text-white/50">{t.locationLabel}</p>
                     <p className="font-medium">{SITE.city}</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Direita — formulário */}
             <div className="rounded-2xl bg-white/[0.04] p-6 ring-1 ring-white/10">
               {sent ? (
                 <div className="flex h-full flex-col items-center justify-center py-10 text-center">
                   <CheckCircle2 className="h-12 w-12 text-accent" />
-                  <h3 className="mt-4 font-display text-xl font-bold">Mensagem enviada!</h3>
-                  <p className="mt-2 text-sm text-white/70">
-                    Obrigado pelo contato. Retornaremos em breve.
-                  </p>
+                  <h3 className="mt-4 font-display text-xl font-bold">{t.form.sentTitle}</h3>
+                  <p className="mt-2 text-sm text-white/70">{t.form.sentDesc}</p>
                   <button
                     onClick={() => setSent(false)}
                     className="mt-5 text-sm font-semibold text-accent hover:underline"
                   >
-                    Enviar outra mensagem
+                    {t.form.sendAnother}
                   </button>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-3">
                   <input
                     className={field}
-                    placeholder="Seu nome *"
+                    placeholder={t.form.name}
                     value={nome}
                     onChange={(e) => setNome(e.target.value)}
                     disabled={sending}
@@ -134,14 +128,14 @@ export function Contact() {
                     <input
                       type="email"
                       className={field}
-                      placeholder="E-mail *"
+                      placeholder={t.form.email}
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       disabled={sending}
                     />
                     <input
                       className={field}
-                      placeholder="Telefone"
+                      placeholder={t.form.phone}
                       value={telefone}
                       onChange={(e) => setTelefone(e.target.value)}
                       disabled={sending}
@@ -150,7 +144,7 @@ export function Contact() {
                   <textarea
                     className={`${field} resize-none`}
                     rows={4}
-                    placeholder="Como podemos ajudar? *"
+                    placeholder={t.form.message}
                     value={mensagem}
                     onChange={(e) => setMensagem(e.target.value)}
                     disabled={sending}
@@ -162,7 +156,7 @@ export function Contact() {
                     className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-primary disabled:opacity-60"
                   >
                     {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                    Enviar mensagem
+                    {sending ? t.form.sending : t.form.submit}
                   </button>
                 </form>
               )}

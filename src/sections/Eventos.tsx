@@ -3,6 +3,7 @@ import { Calendar, Play, X, ImageIcon, ChevronLeft, ChevronRight, Images } from 
 import { listEventos, toEmbedUrl, type Evento } from '@/services/content.service';
 import { hasSupabase } from '@/lib/supabase';
 import { eventosEstaticos } from '@/lib/eventosEstaticos';
+import { useT, useLang } from '@/i18n/LangContext';
 
 const DEMO_EVENTOS: Evento[] = [
   {
@@ -31,10 +32,15 @@ const DEMO_EVENTOS: Evento[] = [
   },
 ];
 
-function formatData(d: string | null): string {
+function formatData(d: string | null, lang: 'pt' | 'en'): string {
   if (!d) return '';
-  const [y, m, day] = d.split('T')[0].split('-');
-  return day && m && y ? `${day}/${m}/${y}` : '';
+  const iso = d.split('T')[0];
+  const dt = new Date(iso + 'T12:00:00');
+  if (Number.isNaN(dt.getTime())) return '';
+  if (lang === 'pt') {
+    return dt.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  }
+  return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 function isExternalVideo(url: string): boolean {
@@ -42,6 +48,8 @@ function isExternalVideo(url: string): boolean {
 }
 
 export function Eventos() {
+  const t = useT().eventos;
+  const { lang } = useLang();
   const [eventos, setEventos] = useState<Evento[]>([]);
   const [loading, setLoading] = useState(true);
   const [active, setActive] = useState<Evento | null>(null);
@@ -65,14 +73,12 @@ export function Eventos() {
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
           <span className="text-sm font-semibold uppercase tracking-wider text-primary">
-            Eventos & Novidades
+            {t.eyebrow}
           </span>
           <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-ink sm:text-4xl">
-            A Infinity em movimento
+            {t.title}
           </h2>
-          <p className="mt-4 text-lg text-muted">
-            Acompanhe nossa presença em eventos, treinamentos e momentos marcantes.
-          </p>
+          <p className="mt-4 text-lg text-muted">{t.description}</p>
         </div>
 
         <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -113,7 +119,7 @@ export function Eventos() {
                   {ev.data && (
                     <p className="flex items-center gap-1.5 text-xs font-medium text-muted">
                       <Calendar className="h-3.5 w-3.5" />
-                      {formatData(ev.data)}
+                      {formatData(ev.data, lang)}
                     </p>
                   )}
                   <h3 className="mt-1.5 font-display text-lg font-bold text-ink">{ev.titulo}</h3>
@@ -125,13 +131,14 @@ export function Eventos() {
         </div>
       </div>
 
-      {active && <Lightbox evento={active} onClose={() => setActive(null)} />}
+      {active && <Lightbox evento={active} onClose={() => setActive(null)} lang={lang} />}
     </section>
   );
 }
 
 /* ---- Lightbox com galeria (vídeo + fotos) ---- */
-function Lightbox({ evento, onClose }: { evento: Evento; onClose: () => void }) {
+function Lightbox({ evento, onClose, lang }: { evento: Evento; onClose: () => void; lang: 'pt' | 'en' }) {
+  const tl = useT().eventos;
   // monta a lista de mídias: vídeo (se houver) + fotos
   const media = useMemo(() => {
     const list: { type: 'video' | 'image'; src: string }[] = [];
@@ -157,7 +164,7 @@ function Lightbox({ evento, onClose }: { evento: Evento; onClose: () => void }) 
         <button
           onClick={onClose}
           className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-ink shadow-soft hover:bg-white"
-          aria-label="Fechar"
+          aria-label={tl.closeAria}
         >
           <X className="h-5 w-5" />
         </button>
@@ -185,14 +192,14 @@ function Lightbox({ evento, onClose }: { evento: Evento; onClose: () => void }) 
               <button
                 onClick={() => go(-1)}
                 className="absolute left-3 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-white/80 text-ink hover:bg-white"
-                aria-label="Anterior"
+                aria-label={tl.prevAria}
               >
                 <ChevronLeft className="h-5 w-5" />
               </button>
               <button
                 onClick={() => go(1)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-white/80 text-ink hover:bg-white"
-                aria-label="Próxima"
+                aria-label={tl.nextAria}
               >
                 <ChevronRight className="h-5 w-5" />
               </button>
@@ -227,7 +234,7 @@ function Lightbox({ evento, onClose }: { evento: Evento; onClose: () => void }) 
           {evento.data && (
             <p className="flex items-center gap-1.5 text-xs font-medium text-muted">
               <Calendar className="h-3.5 w-3.5" />
-              {formatData(evento.data)}
+              {formatData(evento.data, lang)}
             </p>
           )}
           <h3 className="mt-1.5 font-display text-xl font-bold text-ink">{evento.titulo}</h3>

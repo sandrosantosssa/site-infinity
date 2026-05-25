@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, ShieldCheck, Zap, Infinity as InfinityIcon, Volume2, VolumeX } from 'lucide-react';
 import { SITE } from '@/lib/utils';
+import { useT } from '@/i18n/LangContext';
 
 export function Hero() {
+  const t = useT().hero;
   const videoRef = useRef<HTMLVideoElement>(null);
   const [muted, setMuted] = useState(true);
 
@@ -38,27 +40,25 @@ export function Hero() {
         <div className="max-w-3xl">
           <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-white backdrop-blur">
             <InfinityIcon className="h-3.5 w-3.5" />
-            Software e tecnologia sob medida
+            {t.badge}
           </span>
 
           <h1
             className="mt-6 font-display text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-7xl"
             style={{ textShadow: '0 2px 30px rgb(0 0 0 / 0.45)' }}
           >
-            Tecnologia que{' '}
+            {t.titlePre}{' '}
             <span className="bg-gradient-to-r from-[#7fe7df] via-[#5fded3] to-[#7fe7df] bg-clip-text text-transparent animate-gradient">
-              move
+              {t.titleHighlight}
             </span>{' '}
-            o seu negócio.
+            {t.titlePost}
           </h1>
 
           <p
             className="mt-6 max-w-2xl text-lg leading-relaxed text-white/90 sm:text-xl"
             style={{ textShadow: '0 1px 18px rgb(0 0 0 / 0.5)' }}
           >
-            A Infinity Sistemas desenvolve plataformas web, automações e soluções
-            de TI que simplificam a sua operação e impulsionam resultados, com
-            segurança e tecnologia de ponta.
+            {t.description}
           </p>
 
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
@@ -66,41 +66,41 @@ export function Hero() {
               href="#contato"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-semibold text-white shadow-soft-lg transition-all hover:-translate-y-0.5 hover:bg-primary-dark"
             >
-              Solicitar uma demonstração
+              {t.ctaPrimary}
               <ArrowRight className="h-4 w-4" />
             </a>
             <a
               href="#solucoes"
               className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 bg-white/5 px-7 py-3.5 text-sm font-semibold text-white backdrop-blur transition-all hover:bg-white/10"
             >
-              Conheça as soluções
+              {t.ctaSecondary}
             </a>
           </div>
 
           <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-white/80">
             <span className="inline-flex items-center gap-1.5">
-              <ShieldCheck className="h-4 w-4 text-[#7fe7df]" /> Segurança e LGPD
+              <ShieldCheck className="h-4 w-4 text-[#7fe7df]" /> {t.badges.lgpd}
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <Zap className="h-4 w-4 text-[#7fe7df]" /> Implantação ágil
+              <Zap className="h-4 w-4 text-[#7fe7df]" /> {t.badges.agile}
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <InfinityIcon className="h-4 w-4 text-[#7fe7df]" /> Soluções sob medida
+              <InfinityIcon className="h-4 w-4 text-[#7fe7df]" /> {t.badges.custom}
             </span>
           </div>
         </div>
       </div>
 
-      {/* Toggle de som — canto inferior direito */}
+      {/* Toggle de som — canto INFERIOR ESQUERDO (não conflita com WhatsApp à direita) */}
       <button
         type="button"
         onClick={() => setMuted((m) => !m)}
-        aria-label={muted ? 'Ativar som' : 'Desativar som'}
-        title={muted ? 'Ativar som' : 'Desativar som'}
-        className="absolute bottom-6 right-6 z-10 inline-flex items-center gap-2 rounded-full border border-white/25 bg-black/35 px-4 py-2 text-xs font-semibold text-white backdrop-blur transition-all hover:bg-black/55"
+        aria-label={muted ? t.soundAriaOn : t.soundAriaOff}
+        title={muted ? t.soundAriaOn : t.soundAriaOff}
+        className="absolute bottom-6 left-6 z-10 inline-flex items-center gap-2 rounded-full border border-white/25 bg-black/35 px-4 py-2 text-xs font-semibold text-white backdrop-blur transition-all hover:bg-black/55"
       >
         {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-        {muted ? 'Som' : 'Mudo'}
+        {muted ? t.soundOn : t.soundOff}
       </button>
     </section>
   );
