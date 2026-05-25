@@ -1,5 +1,6 @@
 import { Mail, MessageCircle } from 'lucide-react';
 import { SITE } from '@/lib/utils';
+import { useT } from '@/i18n/LangContext';
 
 function InstagramIcon({ className }: { className?: string }) {
   return (
@@ -19,16 +20,18 @@ function LinkedinIcon({ className }: { className?: string }) {
   );
 }
 
-const LINKS = [
-  { label: 'Início', href: '#inicio' },
-  { label: 'Soluções', href: '#solucoes' },
-  { label: 'Serviços', href: '#servicos' },
-  { label: 'Sobre', href: '#sobre' },
-  { label: 'Contato', href: '#contato' },
-];
-
 export function Footer() {
+  const t = useT();
   const year = new Date().getFullYear();
+
+  const LINKS = [
+    { label: t.footer.navItems.home, href: '#inicio' },
+    { label: t.footer.navItems.solutions, href: '#solucoes' },
+    { label: t.footer.navItems.services, href: '#servicos' },
+    { label: t.footer.navItems.about, href: '#sobre' },
+    { label: t.footer.navItems.contact, href: '#contato' },
+  ];
+
   return (
     <footer className="border-t border-border bg-surface">
       <div className="mx-auto max-w-7xl px-5 py-14 lg:px-8">
@@ -36,8 +39,7 @@ export function Footer() {
           <div className="lg:col-span-2">
             <img src="/LOGOMARCA.png" alt={SITE.brand} className="h-10 w-auto" />
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted">
-              Tecnologia e software sob medida para o seu negócio. Plataformas web,
-              automação e soluções de TI com segurança e inovação.
+              {t.footer.description}
             </p>
             <div className="mt-5 flex gap-3">
               <a
@@ -62,10 +64,10 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="font-display text-sm font-bold text-ink">Navegação</h4>
+            <h4 className="font-display text-sm font-bold text-ink">{t.footer.nav}</h4>
             <ul className="mt-4 space-y-2.5">
               {LINKS.map((l) => (
-                <li key={l.href}>
+                <li key={l.href + l.label}>
                   <a href={l.href} className="text-sm text-muted transition-colors hover:text-primary">
                     {l.label}
                   </a>
@@ -75,7 +77,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="font-display text-sm font-bold text-ink">Contato</h4>
+            <h4 className="font-display text-sm font-bold text-ink">{t.footer.contact}</h4>
             <ul className="mt-4 space-y-2.5">
               <li>
                 <a
@@ -101,7 +103,7 @@ export function Footer() {
 
         <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-border pt-6 text-sm text-muted sm:flex-row">
           <p>
-            © {year} {SITE.brand}. Todos os direitos reservados.
+            © {year} {SITE.brand}. {t.footer.rights}
           </p>
           <p>CNPJ {SITE.cnpj} · {SITE.city}</p>
         </div>

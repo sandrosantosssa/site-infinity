@@ -1,19 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Newspaper, ArrowUpRight, Clock } from 'lucide-react';
 import { listNoticias, type NewsItem } from '@/services/news.service';
-
-function timeAgo(date: string | null): string {
-  if (!date) return '';
-  const diff = Date.now() - Date.parse(date);
-  if (isNaN(diff)) return '';
-  const h = Math.floor(diff / 3_600_000);
-  if (h < 1) return 'agora há pouco';
-  if (h < 24) return `há ${h}h`;
-  const d = Math.floor(h / 24);
-  return `há ${d}d`;
-}
+import { useT } from '@/i18n/LangContext';
 
 export function Noticias() {
+  const t = useT().noticias;
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -22,6 +13,17 @@ export function Noticias() {
       .then(setNews)
       .finally(() => setLoading(false));
   }, []);
+
+  function timeAgo(date: string | null): string {
+    if (!date) return '';
+    const diff = Date.now() - Date.parse(date);
+    if (Number.isNaN(diff)) return '';
+    const h = Math.floor(diff / 3_600_000);
+    if (h < 1) return t.timeNow;
+    if (h < 24) return t.timeHours(h);
+    const d = Math.floor(h / 24);
+    return t.timeDays(d);
+  }
 
   if (loading || news.length === 0) return null;
 
@@ -32,14 +34,12 @@ export function Noticias() {
           <div>
             <span className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-primary">
               <Newspaper className="h-4 w-4" />
-              Fique por dentro
+              {t.eyebrow}
             </span>
             <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-ink sm:text-4xl">
-              Notícias de tecnologia
+              {t.title}
             </h2>
-            <p className="mt-3 max-w-xl text-lg text-muted">
-              As principais novidades do mundo tech, direto das maiores fontes do Brasil.
-            </p>
+            <p className="mt-3 max-w-xl text-lg text-muted">{t.description}</p>
           </div>
         </div>
 
@@ -79,7 +79,7 @@ export function Noticias() {
                     {timeAgo(n.date)}
                   </span>
                   <span className="inline-flex items-center gap-1 font-semibold text-primary">
-                    Ler <ArrowUpRight className="h-3.5 w-3.5" />
+                    {t.readLink} <ArrowUpRight className="h-3.5 w-3.5" />
                   </span>
                 </div>
               </div>
@@ -87,9 +87,7 @@ export function Noticias() {
           ))}
         </div>
 
-        <p className="mt-8 text-center text-xs text-muted">
-          Conteúdo de terceiros, exibido com link para a fonte original (TecMundo, Olhar Digital).
-        </p>
+        <p className="mt-8 text-center text-xs text-muted">{t.attribution}</p>
       </div>
     </section>
   );
